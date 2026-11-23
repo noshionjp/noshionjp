@@ -93,8 +93,8 @@
 			},
 			// Color for blockquotes and other special text
 			quote: {
-				light: "203 41 65",
-				dark: "205 254 183",
+				light: "237 202 136",
+				dark: "237 202 136",
 			},
 		},
 		"fontfamily-google-fonts": {
