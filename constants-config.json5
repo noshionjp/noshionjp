@@ -68,18 +68,18 @@
 		colors: {
 			// Background colors
 			bg: {
-				light: "249 249 249",
-				dark: "28 30 32",
+				light: "255 255 255",
+				dark: "25 25 25",
 			},
 			// Main text colors
 			text: {
-				light: "34 39 42",
-				dark: "255 255 255",
+				light: "16 20 25",
+				dark: "240 239 237",
 			},
 			// Link colors
 			link: {
-				light: "85 123 118",
-				dark: "199 200 203",
+				light: "85 113 165",
+				dark: "85 113 165",
 			},
 			// Primary accent color (e.g., for titles, highlights)
 			accent: {
