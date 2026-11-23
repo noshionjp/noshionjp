@@ -83,13 +83,13 @@
 			},
 			// Primary accent color (e.g., for titles, highlights)
 			accent: {
-				light: "203 41 65",
-				dark: "41 188 136",
+				light: "85 113 165",
+				dark: "85 113 165",
 			},
 			// Secondary accent color (e.g., for borders, subtle highlights)
 			"accent-2": {
-				light: "17 17 17",
-				dark: "237 237 237",
+				light: "85 113 165",
+				dark: "85 113 165",
 			},
 			// Color for blockquotes and other special text
 			quote: {
