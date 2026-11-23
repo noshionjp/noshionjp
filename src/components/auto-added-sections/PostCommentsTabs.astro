@@ -1,0 +1,162 @@
+<post-comments-tabs>
+	<slot />
+</post-comments-tabs>
+
+<script>
+	// Embed the CSS so the static site does not need to serve a cross-origin theme file.
+	const createCommentTheme = (base: "light" | "transparent_dark") =>
+		`data:text/css,${encodeURIComponent(`
+		@import url("https://giscus.app/themes/${base}.css");
+		main {
+			--color-canvas-default: transparent;
+			--color-canvas-inset: transparent;
+			--color-canvas-subtle: transparent;
+		}
+		.gsc-comment-box-textarea {
+			min-height: 64px;
+			height: 64px;
+		}
+	`)}`;
+	const transparentLightTheme = createCommentTheme("light");
+	const transparentDarkTheme = createCommentTheme("transparent_dark");
+
+	class PostCommentsTabs extends HTMLElement {
+		#initialized = false;
+		#isIntersecting = false;
+		#observer: IntersectionObserver | null = null;
+		#themeObserver: MutationObserver | null = null;
+		#giscusTheme = "";
+
+		connectedCallback() {
+			if (this.#initialized) return;
+			requestAnimationFrame(() => this.#initializeWhenReady());
+		}
+
+		#initializeWhenReady() {
+			if (this.#initialized || !this.isConnected) return;
+
+			const tabs = this.querySelectorAll<HTMLButtonElement>(".tab");
+			const panes = this.querySelectorAll<HTMLElement>(".tab-pane");
+			if (!tabs.length || !panes.length) {
+				requestAnimationFrame(() => this.#initializeWhenReady());
+				return;
+			}
+
+			this.#initialized = true;
+			this.#syncGiscusTheme();
+			this.#themeObserver = new MutationObserver(() => this.#syncGiscusTheme());
+			this.#themeObserver.observe(document.documentElement, {
+				attributes: true,
+				attributeFilter: ["class"],
+			});
+			// Apply the current site theme even if it changed while the iframe was loading.
+			this.addEventListener("load", () => this.#syncGiscusTheme(true), true);
+
+			tabs.forEach((tab) => {
+				tab.addEventListener("click", () => {
+					const activate = () => this.#activateTab(tab, tabs, panes);
+					const startViewTransition = (
+						document as Document & { startViewTransition?: (callback: () => void) => void }
+					).startViewTransition;
+					if (startViewTransition) {
+						startViewTransition.call(document, activate);
+					} else {
+						activate();
+					}
+				});
+			});
+
+			tabs[0]?.click();
+			this.#observer = new IntersectionObserver(
+				(entries) => {
+					this.#isIntersecting = entries.some((entry) => entry.isIntersecting);
+					if (this.#isIntersecting) this.#loadActivePane();
+				},
+				{ rootMargin: "0px" },
+			);
+			this.#observer.observe(this);
+		}
+
+		disconnectedCallback() {
+			this.#observer?.disconnect();
+			this.#themeObserver?.disconnect();
+		}
+
+		#syncGiscusTheme(force = false) {
+			const theme = document.documentElement.classList.contains("dark")
+				? transparentDarkTheme
+				: transparentLightTheme;
+			if (!force && theme === this.#giscusTheme) return;
+			this.#giscusTheme = theme;
+			const target = this.querySelector<HTMLElement>("[data-giscus-comments]");
+			if (!target) return;
+			target.dataset.theme = theme;
+			this.querySelector<HTMLIFrameElement>(".giscus-frame")?.contentWindow?.postMessage(
+				{ giscus: { setConfig: { theme } } },
+				"https://giscus.app",
+			);
+		}
+
+		#activateTab(
+			tab: HTMLButtonElement,
+			tabs: NodeListOf<HTMLButtonElement>,
+			panes: NodeListOf<HTMLElement>,
+		) {
+			const targetTab = tab.dataset.tab;
+
+			panes.forEach((pane) => {
+				pane.hidden = pane.id !== `${targetTab}-tab`;
+			});
+
+			tabs.forEach((item) => item.classList.remove("active"));
+			tab.classList.add("active");
+			if (this.#isIntersecting) this.#loadActivePane();
+		}
+
+		#loadActivePane() {
+			const activePane = this.querySelector<HTMLElement>(".tab-pane:not([hidden])");
+			const target = activePane?.querySelector<HTMLElement>("[data-giscus-comments]");
+			if (!target || target.dataset.loaded === "true") return;
+
+			target.dataset.loaded = "true";
+			const script = document.createElement("script");
+			script.src = "https://giscus.app/client.js";
+			script.async = true;
+			script.crossOrigin = "anonymous";
+
+			const configKeys = [
+				"repo",
+				"repoId",
+				"category",
+				"categoryId",
+				"mapping",
+				"strict",
+				"reactionsEnabled",
+				"emitMetadata",
+				"inputPosition",
+				"theme",
+				"lang",
+				"loading",
+			];
+
+			for (const key of configKeys) {
+				const value = target.dataset[key];
+				if (!value) continue;
+				const attrName = `data-${key
+					.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+					.replace(/^-/, "")}`;
+				script.setAttribute(attrName, value);
+			}
+
+			target.append(script);
+		}
+	}
+
+	customElements.define("post-comments-tabs", PostCommentsTabs);
+</script>
+
+<style>
+	post-comments-tabs {
+		display: block;
+	}
+</style>
