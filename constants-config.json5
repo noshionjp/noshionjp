@@ -79,17 +79,17 @@
 			// Link colors
 			link: {
 				light: "85 113 165",
-				dark: "85 113 165",
+				dark: "220 228 239",
 			},
 			// Primary accent color (e.g., for titles, highlights)
 			accent: {
 				light: "85 113 165",
-				dark: "85 113 165",
+				dark: "220 228 239",
 			},
 			// Secondary accent color (e.g., for borders, subtle highlights)
 			"accent-2": {
 				light: "85 113 165",
-				dark: "85 113 165",
+				dark: "220 228 239",
 			},
 			// Color for blockquotes and other special text
 			quote: {
@@ -127,6 +127,7 @@
 		twitter: "https://x.com/NoshionJP",
 		threads: "",
 		instagram: "",
+    youtube: "https://www.youtube.com/channel/UC7X5VZZthZPRmqsSk0smy7w",
 		mastodon: "",
 		bluesky: "",
 		calendar: "",
