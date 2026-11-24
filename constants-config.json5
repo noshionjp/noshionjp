@@ -79,17 +79,17 @@
 			// Link colors
 			link: {
 				light: "85 113 165",
-				dark: "220 228 239",
+				dark: "136 155 192",
 			},
 			// Primary accent color (e.g., for titles, highlights)
 			accent: {
 				light: "85 113 165",
-				dark: "220 228 239",
+				dark: "136 155 192",
 			},
 			// Secondary accent color (e.g., for borders, subtle highlights)
 			"accent-2": {
 				light: "85 113 165",
-				dark: "220 228 239",
+				dark: "136 155 192",
 			},
 			// Color for blockquotes and other special text
 			quote: {
